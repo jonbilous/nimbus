@@ -4,6 +4,7 @@ import { promises as fs } from "fs";
 import path from "path";
 
 const rds = new AWS.RDS({ region: "us-east-1" });
+const nimbusDir = path.resolve(process.cwd(), ".nimbus");
 
 type Engine = "aurora-mysql" | "aurora-postgresql";
 
@@ -68,6 +69,8 @@ const create = async (name: string, engine: Engine) => {
     const prismaUrl = `postgresql://${username}:${password}@${endpoint}/${name}?schema=public`;
 
     const result = { name, username, password, endpoint, prismaUrl };
+
+    await fs.mkdir(nimbusDir).catch(() => {});
 
     await fs.writeFile(
       path.resolve(process.cwd(), ".nimbus", [name, ".json"].join("")),
